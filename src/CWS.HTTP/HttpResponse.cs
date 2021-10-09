@@ -8,7 +8,7 @@
 
     public class HttpResponse
     {
-        public HttpResponse(StatusCode statusCode, string contentType = MimeTypes.Text)
+        public HttpResponse(StatusCode statusCode = StatusCode.Ok, string contentType = MimeTypes.Text)
         {
             Headers = new();
             Cookies = new();

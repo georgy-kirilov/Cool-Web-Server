@@ -44,13 +44,12 @@
                 TcpClient client = await listener.AcceptTcpClientAsync();
                 using NetworkStream stream = client.GetStream();
 
-                var response = new HttpResponse(StatusCode.Ok);
                 HttpRequest request = await ReadRequestAsync(stream);
 
-                ManageSessionCookie(request, response);
-                ManageAction(request, response);
+                ResponseCookie session = ManageSessionCookie(request);
+                HttpResponse response = ManageAction(request);
 
-                Console.WriteLine(response);
+                response.Cookies.Add(session);
 
                 await stream.WriteAsync(response.ToByteArray());
             }
@@ -86,42 +85,44 @@
             return new HttpRequest(request);
         }
 
-        private void ManageSessionCookie(HttpRequest request, HttpResponse response)
+        private ResponseCookie ManageSessionCookie(HttpRequest request)
         {
             var sessionCookie = request.SessionCookie ?? Guid.NewGuid().ToString();
 
             if (request.SessionCookie == null)
             {
-                var responseSessionCookie = new ResponseCookie(Constants.SessionCookieName, sessionCookie, 30);
+                var responseSessionCookie = new ResponseCookie(Constants.SessionCookieName, sessionCookie);
                 HttpRequest.Sessions.Add(sessionCookie, new());
-                response.Cookies.Add(responseSessionCookie);
+                return responseSessionCookie;
             }
+
+            return null;
         }
 
-        private void ManageAction(HttpRequest request, HttpResponse response)
+        private HttpResponse ManageAction(HttpRequest request)
         {
             var route = new Route(request.Method, request.Path);
             var action = routingTable.GetAction(route);
 
             if (action != null)
             {
-                InvokeAction(action, request, response);
+                return InvokeAction(action, request);
             }
             else
             {
-                response.StatusCode = StatusCode.NotFound;
+                return new HttpResponse(StatusCode.NotFound);
             }
         }
 
-        private void InvokeAction(Action<HttpRequest, HttpResponse> action, HttpRequest request, HttpResponse response)
+        private HttpResponse InvokeAction(Func<HttpRequest, HttpResponse> action, HttpRequest request)
         {
             try
             {
-                action?.Invoke(request, response);
+                return action.Invoke(request);
             }
             catch (Exception)
             {
-                response.StatusCode = StatusCode.InternalServerError;
+                return new HttpResponse(StatusCode.InternalServerError);
             }
         }
     }

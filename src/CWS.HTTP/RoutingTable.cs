@@ -5,7 +5,7 @@
 
     public class RoutingTable
     {
-        private readonly Dictionary<Route, Action<HttpRequest, HttpResponse>> routes = new();
+        private readonly Dictionary<Route, Func<HttpRequest, HttpResponse>> routes = new();
 
         private readonly bool overrideExistingRoutes;
 
@@ -14,7 +14,7 @@
             this.overrideExistingRoutes = overrideExistingRoutes;
         }
 
-        public void AddRoute(Method method, string path, Action<HttpRequest, HttpResponse> action)
+        public void AddRoute(Method method, string path, Func<HttpRequest, HttpResponse> action)
         {
             var route = new Route(method, path);
 
@@ -34,7 +34,7 @@
             }
         }
 
-        public Action<HttpRequest, HttpResponse> GetAction(Route route)
+        public Func<HttpRequest, HttpResponse> GetAction(Route route)
         {
             if (!routes.ContainsKey(route))
             {

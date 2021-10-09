@@ -23,28 +23,43 @@
 
         static readonly string Navbar = File.ReadAllText("./static/navbar.html");
 
-        public static void Home(HttpRequest request, HttpResponse response)
+        public static HttpResponse Home(HttpRequest request)
         {
             string html = Navbar + "<h1>Home</h1>";
 
-            response.ContentType = MimeTypes.Html;
-            response.Body = Encoding.UTF8.GetBytes(html);
+            var response = new HttpResponse()
+            {
+                ContentType = MimeTypes.Html,
+                Body = Encoding.UTF8.GetBytes(html),
+            };
+
+            return response;
         }
 
-        public static void About(HttpRequest request, HttpResponse response)
+        public static HttpResponse About(HttpRequest request)
         {
             string html = Navbar + "<h1>About</h1>";
 
-            response.ContentType = MimeTypes.Html;
-            response.Body = Encoding.UTF8.GetBytes(html);
+            var response = new HttpResponse()
+            {
+                ContentType = MimeTypes.Html,
+                Body = Encoding.UTF8.GetBytes(html),
+            };
+
+            return response;
         }
 
-        public static void Privacy(HttpRequest request, HttpResponse response)
+        public static HttpResponse Privacy(HttpRequest request)
         {
             string html = Navbar + "<h1>Privacy</h1>";
 
-            response.ContentType = MimeTypes.Html;
-            response.Body = Encoding.UTF8.GetBytes(html);
+            var response = new HttpResponse()
+            {
+                ContentType = MimeTypes.Html,
+                Body = Encoding.UTF8.GetBytes(html),
+            };
+
+            return response;
         }
     }
 }
